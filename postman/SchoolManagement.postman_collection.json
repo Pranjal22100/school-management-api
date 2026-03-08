@@ -1,0 +1,138 @@
+{
+  "info": {
+    "name": "School Management API",
+    "_postman_id": "school-mgmt-collection-v1",
+    "description": "Postman collection for School Management APIs — Add School and List Schools by proximity.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": ["{{baseUrl}}"],
+          "path": [""]
+        },
+        "description": "Check if the API server is running."
+      },
+      "response": [
+        {
+          "name": "Success",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"message\": \"School Management API is running 🚀\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "Add School - Success",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Delhi Public School\",\n  \"address\": \"Sector 45, Gurugram, Haryana\",\n  \"latitude\": 28.4089,\n  \"longitude\": 77.0421\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/addSchool",
+          "host": ["{{baseUrl}}"],
+          "path": ["addSchool"]
+        },
+        "description": "Adds a new school. All fields are required."
+      },
+      "response": [
+        {
+          "name": "201 Created",
+          "status": "Created",
+          "code": 201,
+          "body": "{\n  \"success\": true,\n  \"message\": \"School added successfully.\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Delhi Public School\",\n    \"address\": \"Sector 45, Gurugram, Haryana\",\n    \"latitude\": 28.4089,\n    \"longitude\": 77.0421\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "Add School - Validation Error",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"\",\n  \"address\": \"Some Address\",\n  \"latitude\": 999,\n  \"longitude\": 77.04\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/addSchool",
+          "host": ["{{baseUrl}}"],
+          "path": ["addSchool"]
+        },
+        "description": "Demonstrates validation: empty name and out-of-range latitude."
+      },
+      "response": [
+        {
+          "name": "400 Bad Request",
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"success\": false,\n  \"errors\": [\n    \"'name' is required and must be a non-empty string.\",\n    \"'latitude' must be a valid number between -90 and 90.\"\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "List Schools - Sorted by Proximity",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/listSchools?latitude=28.6139&longitude=77.2090",
+          "host": ["{{baseUrl}}"],
+          "path": ["listSchools"],
+          "query": [
+            { "key": "latitude", "value": "28.6139", "description": "User's latitude (New Delhi)" },
+            { "key": "longitude", "value": "77.2090", "description": "User's longitude (New Delhi)" }
+          ]
+        },
+        "description": "Returns all schools sorted by proximity to user's coordinates."
+      },
+      "response": [
+        {
+          "name": "200 OK",
+          "status": "OK",
+          "code": 200,
+          "body": "{\n  \"success\": true,\n  \"count\": 2,\n  \"user_location\": {\n    \"latitude\": 28.6139,\n    \"longitude\": 77.2090\n  },\n  \"data\": [\n    {\n      \"id\": 2,\n      \"name\": \"Kendriya Vidyalaya\",\n      \"address\": \"IIT Campus, Hauz Khas, New Delhi\",\n      \"latitude\": 28.5459,\n      \"longitude\": 77.1926,\n      \"distance_km\": 8.05\n    },\n    {\n      \"id\": 1,\n      \"name\": \"Delhi Public School\",\n      \"address\": \"Sector 45, Gurugram, Haryana\",\n      \"latitude\": 28.4089,\n      \"longitude\": 77.0421,\n      \"distance_km\": 26.3\n    }\n  ]\n}"
+        }
+      ]
+    },
+    {
+      "name": "List Schools - Missing Params",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/listSchools",
+          "host": ["{{baseUrl}}"],
+          "path": ["listSchools"]
+        },
+        "description": "Demonstrates validation error when latitude/longitude are missing."
+      },
+      "response": [
+        {
+          "name": "400 Bad Request",
+          "status": "Bad Request",
+          "code": 400,
+          "body": "{\n  \"success\": false,\n  \"errors\": [\n    \"Query param 'latitude' is required.\",\n    \"Query param 'longitude' is required.\"\n  ]\n}"
+        }
+      ]
+    }
+  ]
+}
